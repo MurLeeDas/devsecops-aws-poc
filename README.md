@@ -1,4 +1,4 @@
-# DevSecOps Pipeline POC — AWS Free Tier
+# DevSecOps Pipeline POC — AWS
 **Built by Murali Doss | DevSecOps & Cloud Consultant**
 
 ## What This Demonstrates
