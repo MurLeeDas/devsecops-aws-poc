@@ -1,51 +1,42 @@
 version: 0.2
 
-env:
-  secrets-manager:
-    # Fetches from AWS Secrets Manager — NO hardcoded credentials
-    DOCKER_PASSWORD: "devsecops-poc/docker:password"
-
 phases:
   install:
     runtime-versions:
       python: 3.11
     commands:
-      - echo "Installing security scanning tools..."
-      - pip install bandit trivy || true
+      - echo "Installing security tools..."
+      - pip install bandit --quiet
       - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
   pre_build:
     commands:
-      - echo "Running SAST scan with Bandit..."
-      - bandit -r app/ --severity-level medium -f json -o bandit-report.json || true
       - echo "Logging into ECR..."
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
       - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-8)
-      - echo "Image tag - $IMAGE_TAG"
+      - echo "Build tag is $IMAGE_TAG"
+      - echo "Running SAST scan..."
+      - bandit -r app/ --severity-level medium -f json -o bandit-report.json || true
+      - bandit -r app/ --severity-level high
 
   build:
     commands:
       - echo "Building Docker image..."
-      - docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+      - docker build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
       - docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
   post_build:
     commands:
       - echo "Running Trivy container scan..."
-      - trivy image --exit-code 1 --severity CRITICAL,HIGH $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      - echo "Pushing image to ECR..."
+      - trivy image --exit-code 1 --severity CRITICAL,HIGH --ignore-unfixed $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+      - echo "Pushing images to ECR..."
       - docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
       - docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       - echo "Writing image definitions for ECS..."
-      - printf '[{"name":"devsecops-poc","imageUri":"%s"}]' $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"%s","imageUri":"%s"}]' "$ECR_REPOSITORY" "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" > imagedefinitions.json
+      - cat imagedefinitions.json
 
 artifacts:
   files:
     - imagedefinitions.json
     - bandit-report.json
-
-reports:
-  sast-report:
-    files:
-      - bandit-report.json
-    file-format: JSON

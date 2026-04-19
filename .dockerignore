@@ -1,0 +1,79 @@
+# ─────────────────────────────────────────────────────────────
+# .dockerignore — DevSecOps POC
+# Keeps Docker build context lean and secure
+# Murali Doss | DevSecOps & Cloud Consultant
+# ─────────────────────────────────────────────────────────────
+
+# ── Terraform — never bake infra code into images ────────────
+terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+.terraform/
+.terraform.lock.hcl
+
+# ── Git metadata ─────────────────────────────────────────────
+.git/
+.gitignore
+
+# ── Credentials & Secrets — CRITICAL ─────────────────────────
+.env
+.env.*
+*.pem
+*.key
+*.secret
+secrets.json
+credentials
+.aws/
+
+# ── Security scan reports ────────────────────────────────────
+bandit-report.json
+trivy-report.json
+scan-results/
+
+# ── Python cache — not needed in image ───────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+
+# ── IDE & Editor files ───────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Docs & markdown — not needed in runtime image ────────────
+*.md
+docs/
+LICENSE
+
+# ── CI/CD config — not needed in image ───────────────────────
+.github/
+buildspec.yml
+
+# ── Test files — not needed in production image ──────────────
+tests/
+test_*.py
+*_test.py
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Misc ─────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.bak
+README*

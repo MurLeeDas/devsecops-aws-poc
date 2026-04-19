@@ -1,0 +1,131 @@
+# ─────────────────────────────────────────────────────────────
+# .gitignore — DevSecOps POC
+# Murali Doss | DevSecOps & Cloud Consultant
+# ─────────────────────────────────────────────────────────────
+
+# ── Terraform ────────────────────────────────────────────────
+# Local state — never commit, use S3 backend
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+errored.tfstate
+
+# Terraform plan output — contains sensitive resource details
+*.tfplan
+*.plan
+
+# Terraform lock and cache
+.terraform/
+.terraform.lock.hcl
+
+# Terraform variable files — may contain secrets
+*.tfvars
+*.tfvars.json
+!example.tfvars        # Allow example files as templates
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# ── AWS Credentials — NEVER commit these ─────────────────────
+.aws/
+credentials
+aws-credentials.json
+*_credentials.csv      # IAM access key CSV downloads
+*.pem                  # SSH key pairs
+*.key                  # Private keys
+
+# ── Docker ───────────────────────────────────────────────────
+# Docker build cache metadata
+.dockerignore          # Keep this — but listing for awareness
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# ── Environment & Secrets ────────────────────────────────────
+# CRITICAL — never commit these
+.env
+.env.*
+!.env.example          # Allow example env file as template
+*.secret
+secrets.json
+secrets.yaml
+secrets.yml
+*secret*
+*password*
+*passwd*
+api_keys.json
+
+# ── Security Scan Reports ────────────────────────────────────
+# Generated locally — don't clutter the repo
+bandit-report.json
+trivy-report.json
+scan-results/
+security-reports/
+
+# ── IDE & Editor ─────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store              # Mac finder metadata
+Thumbs.db              # Windows thumbnail cache
+*.sublime-project
+*.sublime-workspace
+
+# ── macOS specific ───────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+
+# ── Test & Coverage ──────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# ── Node (if any tooling added later) ────────────────────────
+node_modules/
+package-lock.json
+
+# ── Miscellaneous ────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.bak
+*.tmp
+*.temp
