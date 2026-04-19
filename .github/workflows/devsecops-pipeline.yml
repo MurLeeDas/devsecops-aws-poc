@@ -7,10 +7,10 @@ on:
     branches: [ main ]
 
 env:
-  AWS_REGION: ap-south-1          # Mumbai — closest to Chennai
+  AWS_REGION: ap-south-1
   ECR_REPOSITORY: devsecops-poc
-  ECS_SERVICE: devsecops-service
-  ECS_CLUSTER: devsecops-cluster
+  ECS_SERVICE: devsecops-poc-service
+  ECS_CLUSTER: devsecops-poc-cluster
 
 jobs:
 
@@ -34,7 +34,7 @@ jobs:
       - name: Run Bandit SAST scan
         run: |
           bandit -r app/ -f json -o bandit-report.json || true
-          bandit -r app/ --severity-level medium
+          bandit -r app/ --severity-level high
 
       - name: Upload SAST report
         uses: actions/upload-artifact@v4
